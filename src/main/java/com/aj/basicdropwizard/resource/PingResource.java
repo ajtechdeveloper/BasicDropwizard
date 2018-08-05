@@ -54,7 +54,6 @@ public class PingResource {
         Map<String, String> response = new HashMap<>();
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
             try {
-                // perform heavyweight task
                 Thread.sleep(15 * 1000);
                 logger.info("Processing complete");
             } catch (InterruptedException ie) {
