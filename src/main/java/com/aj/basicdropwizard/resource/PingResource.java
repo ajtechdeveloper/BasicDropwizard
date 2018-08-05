@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 
 @Path("/ping")
@@ -26,11 +27,10 @@ public class PingResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiOperation(value ="ping")
 	public Response ping() {
-		Map<String, String> response = new HashMap<String, String>();
+		Map<String, String> response = new HashMap<>();
 		response.put("message", "pong");
 		return Response.ok(response).build();
 	}
-
 
     @POST
     @Timed
@@ -43,6 +43,25 @@ public class PingResource {
         if("ping".equalsIgnoreCase(pingRequest.getInput())) {
             response.put("message", "pong");
         }
+        return Response.ok(response).build();
+    }
+
+    @Timed
+    @GET
+    @Path("/async")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response async() {
+        Map<String, String> response = new HashMap<>();
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            try {
+                // perform heavyweight task
+                Thread.sleep(15 * 1000);
+                logger.info("Processing complete");
+            } catch (InterruptedException ie) {
+                logger.error("Error in PingResource.async(): {}", ie.getMessage());
+            }
+        });
+        response.put("message", "Request is under process");
         return Response.ok(response).build();
     }
 }
